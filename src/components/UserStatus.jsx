@@ -1,42 +1,23 @@
 // src/components/UserStatus.jsx
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
-function UserStatus() {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function UserStatus() {
+  const [email, setEmail] = useState("");
 
-useEffect(() => {
-    // Check for an existing session on mount
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
-
-// Listen for auth changes (sign in, sign out, token refresh)
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
-        setSession(newSession);
+  useEffect(() => {
+    supabase.auth.getUser().then((response) => {
+      // Safely access response.data
+      if (response?.data?.user) {
+        setEmail(response.data.user.email);
       }
-    );
-
-// Cleanup: unsubscribe when component unmounts
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    });
   }, []);
 
-if (loading) return <p className="p-4">Checking auth...</p>;
-
-if (session) {
-    return (
-      <p className="p-4 text-green-600">
-        Logged in as: {session.user.email}
-      </p>
-    );
-  }
-
-return <p className="p-4 text-gray-500">Not logged in</p>;
+  return (
+    <div className="text-white text-center">
+      <p className="text-sm text-gray-400">Logged in as:</p>
+      <p className="font-semibold">{email || "Loading..."}</p>
+    </div>
+  );
 }
-
-export default UserStatus;

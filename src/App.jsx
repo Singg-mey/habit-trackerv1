@@ -1,25 +1,30 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
 import AuthForm from "./components/AuthForm";
-import UserStatus from "./components/UserStatus";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   return (
-    // <div className="min-h-screen flex items-center justify-center">
-    //   <AuthForm />
-    // </div>
-
-    // <UserStatus />
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<AuthForm />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route 
+          path="/login" 
+          element={
+            <ErrorBoundary>
+              <AuthForm />
+            </ErrorBoundary>
+          } 
+        />
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <ErrorBoundary>
+                <Dashboard />
+              </ErrorBoundary>
             </ProtectedRoute>
           }
         />
